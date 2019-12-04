@@ -39,20 +39,17 @@ def solve2(input):
 
 
 def is_valid_2(value):
-    digits = [int(digit) for digit in str(value)]
-    last_digit = 0
+    last_digit = ''
     two_the_same = False
     mult_count = 0
 
-    for digit in digits:
+    for digit in str(value):        
         if digit < last_digit:
             return False
-        
+
         if digit == last_digit:
             mult_count += 1
-            #print(str(digit) + ' ' + str(mult_count), ' same')
         else:
-            #print(str(digit) + ' ' + str(mult_count), ' NOT same')
             if mult_count == 2:
                 two_the_same = True
             mult_count = 1
@@ -62,12 +59,10 @@ def is_valid_2(value):
     if mult_count == 2:
         two_the_same = True
 
-    #print()
-
     return two_the_same
 
 
-print('Part 1 ', solve1((264793, 803935)))
+#print('Part 1 ', solve1((264793, 803935)))
 
 print('True 111111', is_valid(111111))
 print('False 223450', is_valid(223450))
