@@ -53,6 +53,8 @@ def run_prog(codes, input_value):
 
         #print(codes[index], instruction.op_code, instruction.param_count, instruction.mode, instruction.param_modes, instruction.length)
         #print(codes[index:index + instruction.length])
+        #print(codes[0:20])
+        print(codes)
 
         if instruction.op_code == 'halt':
             running = False
@@ -79,16 +81,16 @@ def run_prog(codes, input_value):
                 print('Unsupported immediate for output param')
 
             if instruction.op_code == 'add':
-                #print('Adding ', lh_value + rh_value, ' to loc ', target_index)
+                print('Adding ', lh_value + rh_value, ' to loc ', target_index)
                 codes[target_index] = lh_value + rh_value
             elif instruction.op_code == 'mult':
-                #print('Multing ', lh_value * rh_value, ' to loc ', target_index)
+                print('Multing ', lh_value * rh_value, ' to loc ', target_index)
                 codes[target_index] = lh_value * rh_value
             elif instruction.op_code == 'less than':
-                #print('Less than ', lh_value < rh_value, ' to loc ', target_index)
+                print('Less than ', lh_value < rh_value, ' to loc ', target_index)
                 codes[target_index] = 1 if lh_value < rh_value else 0
             elif instruction.op_code == 'equals':
-                #print('Equals ', lh_value == rh_value, ' to loc ', target_index)
+                print('Equals ', lh_value == rh_value, ' to loc ', target_index)
                 codes[target_index] = 1 if lh_value == rh_value else 0
             else:
                 print('Unsupported op_code (3)')
@@ -117,12 +119,15 @@ def run_prog(codes, input_value):
             target_index = codes[index + 1]
             
             if instruction.op_code == 'in':
-                #print('In ', 1, ' to ', target_index)
+                print('In ', input_value, ' to ', target_index)
                 codes[target_index] = input_value
             elif instruction.op_code == 'out':
-                output_value = codes[target_index];
-                #print('Out ', output_value, ' from ', target_index)
-                print('Output: ', output_value)
+                if instruction.param_modes[0] == "immediate":
+                    print('Output (immediate): ', codes[index + 1])
+                else:
+                    output_value = codes[target_index]
+                    print('Out ', output_value, ' from ', target_index)
+                    print('Output: ', output_value)
             else:
                 print('Unsupported op_code (1)')
         else:
@@ -165,4 +170,6 @@ multInsPos = Instruction('0102')
 #print('2,4,4,5,99,9801 ', solve1('2,4,4,5,99,0'))
 #print('1,1,1,4,99,5,6,0,99 ', solve1('1,1,1,4,99,5,6,0,99'))
 
-print('Part 2 ', solve2(data[0]))
+#print('Part 2 ', solve2(data[0]))
+#print(run_prog([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], 5))
+run_prog([3,9,8,9,10,9,4,9,99,-1,8 ], 6)
