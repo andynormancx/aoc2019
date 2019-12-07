@@ -193,16 +193,16 @@ def run_prog(codes, input_values, ip = None):
                 print('Unsupported immediate for output param')
 
             if instruction.op_code == 'add':
-                #print(f'Adding {lh_value} + {rh_value} to loc {target_index}')
+                print(f'Adding {lh_value} + {rh_value} to loc {target_index}')
                 codes[target_index] = lh_value + rh_value
             elif instruction.op_code == 'mult':
-                #print('Multing ', lh_value * rh_value, ' to loc ', target_index)
+                print('Multing ', lh_value * rh_value, ' to loc ', target_index)
                 codes[target_index] = lh_value * rh_value
             elif instruction.op_code == 'less than':
-                #print('Less than ', lh_value < rh_value, ' to loc ', target_index)
+                print('Less than ', lh_value < rh_value, ' to loc ', target_index)
                 codes[target_index] = 1 if lh_value < rh_value else 0
             elif instruction.op_code == 'equals':
-                #print('Equals ', lh_value == rh_value, ' to loc ', target_index)
+                print('Equals ', lh_value == rh_value, ' to loc ', target_index)
                 codes[target_index] = 1 if lh_value == rh_value else 0
             else:
                 print('Unsupported op_code (3)')
@@ -235,7 +235,7 @@ def run_prog(codes, input_values, ip = None):
                     state = 'paused'
                 else:
                     input_value = input_values.pop(0)
-                    #print('In ', input_value, ' to ', target_index)
+                    print('In ', input_value, ' to ', target_index)
                     codes[target_index] = input_value
             elif instruction.op_code == 'out':
                 if instruction.param_modes[0] == "immediate":
@@ -266,7 +266,7 @@ data = IH.InputHelper(7).readlines()
 #run_prog([3,0,4,0,99], 1)
 
 #print('Part 1 ', solve1(data[0]))
-print('Part 2 ', solve2(data[0]))
+#print('Part 2 ', solve2(data[0]))
 solve2('3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5')
 #print('Part 1 ', solve1(data))
 #print('2,0,0,0,99 ', solve1('1,0,0,0,99'))
