@@ -80,75 +80,96 @@ def solve2(input):
                 for d_phase in d_phases:
                     e_phases = d_phases - set([d_phase])
                     e_phase = e_phases.pop()
+
+                    a_phase = 9
+                    b_phase = 8
+                    c_phase = 7
+                    d_phase = 6
+                    e_phase = 5
+
                     print(f'a: {a_phase} b: {b_phase} c: {c_phase} d: {d_phase} e: {e_phase}')
 
                     signal = 0
 
-                    a_vm = VM(codes.copy())
-                    b_vm = VM(codes.copy())
-                    c_vm = VM(codes.copy())
-                    d_vm = VM(codes.copy())
-                    e_vm = VM(codes.copy())
+                    a_vm = VM(codes.copy(), [a_phase, signal], 'A')
+                    b_vm = VM(codes.copy(), [b_phase, signal], 'B')
+                    c_vm = VM(codes.copy(), [c_phase, signal], 'C')
+                    d_vm = VM(codes.copy(), [d_phase, signal], 'D')
+                    e_vm = VM(codes.copy(), [e_phase, signal], 'E')
 
-                    a_vm.run([a_phase, signal])
-                    b_vm.run([b_phase, signal])
-                    b_vm.run([c_phase, signal])
-                    d_vm.run([d_phase, signal])
-                    e_vm.run([e_phase, signal])
+                    a_vm.set_target_vm(b_vm)
+                    b_vm.set_target_vm(c_vm)
+                    c_vm.set_target_vm(d_vm)
+                    d_vm.set_target_vm(e_vm)
+                    e_vm.set_target_vm(a_vm)
 
-                    while True:
-                        signal = a_vm.run([signal])
-                        if signal == -1:
-                            print('a halted')
-                        signal = b_vm.run([signal])
-                        if signal == -1:
-                            print('b halted')
-                        signal = c_vm.run([signal])
-                        if signal == -1:
-                            print('c halted')
-                        signal = d_vm.run([signal])
-                        if signal == -1:
-                            print('d halted')
-                        signal = e_vm.run([signal])
-                        if signal == -1:
-                            max_signal = signal if signal > max_signal else max_signal
-                            print('e halted')
-                            break
+                    while a_vm.running or b_vm.running or c_vm.running or d_vm.running or e_vm.running:
+                        a_vm.run()
+                        b_vm.run()
+                        c_vm.run()
+                        d_vm.run()
+                        e_vm.run()
                     
-    print(max_signal)
+                    print(f'Last output from e {e_vm.last_output}')
+                    max_signal = max(max_signal, e_vm.last_output)
+                    return
+    print(f'Max signal {max_signal}')
     return max_signal
 
 class VM():
-    def __init__(self, memory):
+    def __init__(self, memory, inputs, name):
         self.memory = memory
         self.ip = 0
+        self.inputs = inputs
+        self.target_vm = None
+        self.last_output = None
+        self.running = True
+        self.name = name
 
-    def run(self, inputs):
-        output, self.memory, self.ip = run_prog(self.memory, inputs, self.ip)
-        return output
+    def run(self):
+        if not self.running:
+            print(f'{self.name} halted')
+            return
+
+        output, state, self.memory, self.ip = run_prog(self.memory, self.inputs, self.ip)
+
+        if state == 'output':
+            self.target_vm.add_input(output)
+            self.last_output = output
+            print(f'Amp {self.name} output {output}')
+        elif state == 'halted':
+            self.running = False
+            print(f'{self.name} halted')
+        else:
+            print(f'{self.name} paused')
+
+    def add_input(self, input):
+        self.inputs.append(input)
+
+    def set_target_vm(self, target_vm):
+        self.target_vm = target_vm
 
 def run_prog(codes, input_values, ip = None):
-    print(codes)
-    print(input_values)
-    print(ip)
+    #print(codes)
+    #print(input_values)
+    #print(ip)
     running = True
     if not ip == None:
         index = ip
     else:
         index = 0
 
+    state = 'running'
+    output_value = None
+
     #print(len(codes), ' memory locations')
     while running:
         instruction = Instruction(str(codes[index]))
         jumped = False
 
-        #print(codes[index], instruction.op_code, instruction.param_count, instruction.mode, instruction.param_modes, instruction.length)
-        #print(codes[index:index + instruction.length])
-        #print(codes[0:20])
-        #print(codes)
-
         if instruction.op_code == 'halt':
             running = False
+            state = 'halted'
             continue
 
         lh_value = None
@@ -210,26 +231,32 @@ def run_prog(codes, input_values, ip = None):
             target_index = codes[index + 1]
             
             if instruction.op_code == 'in':
-                input_value = input_values.pop(0)
-                #print('In ', input_value, ' to ', target_index)
-                codes[target_index] = input_value
+                if len(input_values) == 0:
+                    state = 'paused'
+                else:
+                    input_value = input_values.pop(0)
+                    #print('In ', input_value, ' to ', target_index)
+                    codes[target_index] = input_value
             elif instruction.op_code == 'out':
                 if instruction.param_modes[0] == "immediate":
                     output_value = codes[index + 1]
                     running = False
+                    state = 'output'
                 else:
                     output_value = codes[target_index]
                     running = False
+                    state = 'output'
             else:
                 print('Unsupported op_code (1)')
         else:
             print('Unsupported param_count')
             quit()
 
-        if not jumped:
+        if not jumped and not state == 'paused': # need to stay on input instruction if waiting on input
             index += instruction.length
 
-    return output_value, codes, index
+    #print(input_values)
+    return output_value, state, codes, index
 
 def convert(lines):
     return [int(line) for line in lines.split(',')]
@@ -239,7 +266,7 @@ data = IH.InputHelper(7).readlines()
 #run_prog([3,0,4,0,99], 1)
 
 #print('Part 1 ', solve1(data[0]))
-#print('Part 2 ', solve2(data[0]))
+print('Part 2 ', solve2(data[0]))
 solve2('3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5')
 #print('Part 1 ', solve1(data))
 #print('2,0,0,0,99 ', solve1('1,0,0,0,99'))
