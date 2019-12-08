@@ -5,22 +5,12 @@ import itertools
 verbose = True
 
 def solve1(input):
-    layers = []
     pixels_per_layer = 25 * 6
 
-    for index in range(0, len(input), pixels_per_layer):
-        #print(f'{index}')
-        layers.append(input[index:index + pixels_per_layer])
+    layers = [input[index:index + pixels_per_layer] for index in range(0, len(input), pixels_per_layer)]
 
-    min_count = sys.maxsize
-    min_layer = None
-    for layer in layers:
-        count = count_digits(layer, '0')
-        if count < min_count:
-            min_layer = layer
-            min_count = count
-
-    print(count_digits(min_layer, '1') * count_digits(min_layer, '2') )
+    zeros_layer = min(layers, key=lambda x: x.count('0'))
+    print(zeros_layer.count('1') * zeros_layer.count('2'))
 
     image = list(' ' * pixels_per_layer)
 
@@ -41,9 +31,6 @@ def solve1(input):
     for row_index in range(0, 6):
         row = image[row_index * 25 : row_index * 25 + 25]
         print(''.join(row))
-
-def count_digits(layer, digit):
-    return len(list(filter(lambda x: x == digit, list(layer))))
 
 data = IH.InputHelper(8).readlines()
 
