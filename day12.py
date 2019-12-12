@@ -5,9 +5,9 @@ import collections
 import math
 from functools import reduce
 import numpy as np
-from sympy import lcm
+from sympy import ilcm
 
-verbose = True
+verbose = False
 
 def solve1(input):
     positions = input
@@ -103,17 +103,16 @@ def solve2(input):
     y_seen_step = None
     z_seen_step = None
 
+    print()
+    print(f'After 0 steps')
+    for index, pos in enumerate(positions):
+        print(f'pos=<x= {pos[0]}, y=  {pos[1]}, z= {pos[2]}>, ', end='')
+        print(f'vel=<x= {velocities[index][0]} y= {velocities[index][1]} z= {velocities[index][2]}>')
+    print()
+
     running = True
-    while x_seen_step == None and y_seen_step == None and z_seen_step == None:
+    while x_seen_step == None or y_seen_step == None or z_seen_step == None:
         step += 1
-        if verbose or step % 2772 == 0 or step % 2771 == 0 or step % 2773 == 0:
-            print(step)
-            for pos in positions:
-                print(f'x = {pos[0]} y = {pos[1]} z = {pos[2]}')
-            print()
-            for vel in velocities:
-                print(f'x = {vel[0]} y = {vel[1]} z = {vel[2]}')
-            print()
 
         compared = set()
         for moon_index, moon in enumerate(positions):
@@ -147,13 +146,18 @@ def solve2(input):
                     velocities[moon_index][2] += 1
                     velocities[moon_inner_index][2] -= 1
 
+        for moon_index, moon in enumerate(positions):
+            moon[0] += velocities[moon_index][0]
+            moon[1] += velocities[moon_index][1]
+            moon[2] += velocities[moon_index][2]
+
         x_all = (
                 positions[0][0], velocities[0][0],
                 positions[1][0], velocities[1][0],
                 positions[2][0], velocities[2][0],
                 positions[3][0], velocities[3][0]
                 )
-        if x_all in x_seen:
+        if x_all in x_seen and x_seen_step == None:
             x_seen_step = step
             print(f'x: {step}')
         else:
@@ -165,7 +169,7 @@ def solve2(input):
                 positions[2][1], velocities[2][1],
                 positions[3][1], velocities[3][1]
                 )
-        if y_all in y_seen:
+        if y_all in y_seen and y_seen_step == None:
             y_seen_step = step
             print(f'y: {step}')
         else:
@@ -177,16 +181,25 @@ def solve2(input):
                 positions[2][2], velocities[2][2],
                 positions[3][2], velocities[3][2]
                 )
-        if z_all in z_seen:
+        if z_all in z_seen and z_seen_step == None:
             z_seen_step = step
             print(f'z: {step}')
         else:
             z_seen.add(z_all)            
 
+        if verbose and (step) % 10 == 0:
+            print()
+            print(f'After {step} steps')
+            for index, pos in enumerate(positions):
+                print(f'pos=<x= {pos[0]}, y=  {pos[1]}, z= {pos[2]}>, ', end='')
+                print(f'vel=<x= {velocities[index][0]} y= {velocities[index][1]} z= {velocities[index][2]}>')
+            print()
+
+
     print(x_seen_step)
     print(y_seen_step)
     print(z_seen_step)
-    print(lcm(x_seen_step, y_seen_step, z_seen_step))
+    print(ilcm(x_seen_step - 1, y_seen_step - 1, z_seen_step - 1))
 
 data = IH.InputHelper(12).readlines()
 
@@ -214,23 +227,23 @@ data = [
 ]
 
 # example 1
-data = [
-    [-1, 0, 2],
-    [2, -10, -7],
-    [4, -8, 8],
-    [3, 5, -1]
-]
+#data = [
+#    [-1, 0, 2],
+#    [2, -10, -7],
+#    [4, -8, 8],
+#    [3, 5, -1]
+#]
 
 #examle 2
-data = [
-    [-8, -10, 0],
-    [5, 5, 10],
-    [2, -7, 3],
-    [9, -8, -3]
-]
+#data = [
+#    [-8, -10, 0],
+#    [2, -7, 3],
+#    [5, 5, 10],
+#    [9, -8, -3]
+#]
 #quit()
-print('Part 1 ', solve1(data))
-#print('Part 2 ', solve2(data))
+#print('Part 1 ', solve1(data))
+print('Part 2 ', solve2(data))
 #moons = np.array([[17, 5, 1],[-2, -8, 8],[7, -6, 14],[1, -10, 4]])
 #velocity = moons*0
 #print(moons)
