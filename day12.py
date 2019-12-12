@@ -4,7 +4,6 @@ import sys
 import collections
 import math
 from functools import reduce
-import numpy as np
 from sympy import ilcm
 
 verbose = False
@@ -204,21 +203,6 @@ def solve2(input):
 data = IH.InputHelper(12).readlines()
 
 
-#(0, -1) = 0
-#(1, 0) = 90
-#(0, 1) = 180
-#(-1, 0) = 270
-
-
-#print(angle_between((0,0), (0, -1)))
-#print(angle_between((0,0), (1, 0)))
-#print(angle_between((0,0), (0, 1)))
-#print(angle_between((0,0), (-1, 0)))
-#print(angle_between((11, 13), (11, 12)))
-#print(angle_between((11, 13), (12, 13)))
-#print(angle_between((11, 13), (11, 14)))
-#print(angle_between((11, 13), (10, 13)))
-
 data = [
     [-4, -14, 8],
     [1, -8, 10],
@@ -244,7 +228,3 @@ data = [
 #quit()
 #print('Part 1 ', solve1(data))
 print('Part 2 ', solve2(data))
-#moons = np.array([[17, 5, 1],[-2, -8, 8],[7, -6, 14],[1, -10, 4]])
-#velocity = moons*0
-#print(moons)
-#print(velocity)
